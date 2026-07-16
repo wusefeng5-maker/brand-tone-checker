@@ -1,13 +1,16 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { generateToneCheck } from "@/lib/ai/tone-check";
 import type { ToneCheckResult } from "@/lib/ai/types";
+import { buildCheckCreateData } from "@/lib/check-history";
 
 export type CheckToneActionState = {
   error?: string;
   result?: ToneCheckResult;
+  checkId?: string;
 };
 
 function getRequiredString(formData: FormData, key: string) {
@@ -38,6 +41,21 @@ function toFriendlyError(error: unknown) {
   }
 
   return "Tone check failed. Please try again.";
+}
+
+function getAiCallLogContext() {
+  return {
+    provider: process.env.AI_PROVIDER ?? "openai-compatible",
+    model: process.env.OPENAI_COMPATIBLE_MODEL ?? "unknown",
+  };
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message.slice(0, 1000);
+  }
+
+  return "Unknown tone check error.";
 }
 
 export async function checkToneAction(
@@ -90,14 +108,57 @@ export async function checkToneAction(
       brandProfile,
       inputText,
     });
+    const aiContext = getAiCallLogContext();
+    const check = await prisma.check.create({
+      data: {
+        ...buildCheckCreateData({
+          userId: userProfile.id,
+          brandProfileId: brandProfile.id,
+          inputText,
+          result,
+        }),
+        aiCallLogs: {
+          create: {
+            userId: userProfile.id,
+            provider: aiContext.provider,
+            model: aiContext.model,
+            status: "SUCCESS",
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    revalidatePath("/checks");
 
     return {
       result,
+      checkId: check.id,
     };
   } catch (error) {
     console.error("Tone Check Error:", error);
     if (error instanceof Error) {
       console.error(error.stack);
+    }
+
+    try {
+      const aiContext = getAiCallLogContext();
+      await prisma.aiCallLog.create({
+        data: {
+          userId: userProfile.id,
+          provider: aiContext.provider,
+          model: aiContext.model,
+          status: "FAILED",
+          errorMessage: getErrorMessage(error),
+        },
+      });
+    } catch (logError) {
+      console.error("Tone Check Error:", logError);
+      if (logError instanceof Error) {
+        console.error(logError.stack);
+      }
     }
 
     return {
