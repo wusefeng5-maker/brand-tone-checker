@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test:admin": "node --test lib/admin-rules.test.mjs",
     "test:brand-profiles": "node --test lib/brand-profile-rules.test.mjs",
     "test:check-history": "node --test lib/check-history.test.mjs",
     "test:tone-check": "node --test lib/ai/tone-check.test.mjs",
