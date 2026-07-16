@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model UserProfile {
+  id            String         @id @default(cuid())
+  clerkUserId   String         @unique
+  email         String?
+  plan          Plan           @default(FREE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  aiCallLogs    AiCallLog[]
+  brandProfiles BrandProfile[]
+  checks        Check[]
+  usageLogs     UsageLog[]
+
+  @@index([createdAt])
+}
+
+model BrandProfile {
+  id             String      @id @default(cuid())
+  userId         String
+  name           String
+  audience       String?
+  toneTags       String[]    @default([])
+  forbiddenWords String[]    @default([])
+  requiredWords  String[]    @default([])
+  exampleCopy    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  user           UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checks         Check[]
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model Check {
+  id             String        @id @default(cuid())
+  userId         String
+  brandProfileId String?
+  inputText      String
+  score          Int
+  issues         Json          @default("[]")
+  rewrite        String?
+  tagHits        Json          @default("{}")
+  createdAt      DateTime      @default(now())
+  aiCallLogs     AiCallLog[]
+  brandProfile   BrandProfile? @relation(fields: [brandProfileId], references: [id])
+  user           UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([brandProfileId, createdAt])
+}
+
+model UsageLog {
+  id        String      @id @default(cuid())
+  userId    String
+  day       DateTime    @db.Date
+  count     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId])
+}
+
+model AiCallLog {
+  id               String       @id @default(cuid())
+  userId           String
+  checkId          String?
+  provider         String
+  model            String
+  status           AiCallStatus
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  errorMessage     String?
+  createdAt        DateTime     @default(now())
+  check            Check?       @relation(fields: [checkId], references: [id])
+  user             UserProfile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([checkId])
+  @@index([provider, model])
+}
+
+enum Plan {
+  FREE
+  PRO
+  AGENCY
+}
+
+enum AiCallStatus {
+  SUCCESS
+  FAILED
+}
