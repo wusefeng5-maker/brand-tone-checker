@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "pnpm test:admin && pnpm test:brand-profiles && pnpm test:check-history && pnpm test:prompt && pnpm test:tone-check",
     "test:admin": "node --test lib/admin-rules.test.mjs",
     "test:brand-profiles": "node --test lib/brand-profile-rules.test.mjs",
     "test:check-history": "node --test lib/check-history.test.mjs",
@@ -16,7 +17,7 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
-    "@clerk/nextjs": "latest",
+    "@clerk/nextjs": "7.5.18",
     "@prisma/client": "^6.13.0",
     "next": "^15.5.0",
     "react": "^19.1.0",

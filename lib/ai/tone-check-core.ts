@@ -26,12 +26,10 @@ function ensureStringArray(value: unknown, fieldName: string): string[] {
 
 export function parseToneCheckResult(rawText: string): ToneCheckResult {
   let parsed: unknown;
-  const rawOutput = rawText;
 
   try {
     parsed = JSON.parse(extractJson(rawText));
   } catch {
-    console.error("Raw AI output:", rawOutput);
     throw new Error("AI returned invalid JSON.");
   }
 

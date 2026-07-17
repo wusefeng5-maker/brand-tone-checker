@@ -13,6 +13,8 @@ export type CheckToneActionState = {
   checkId?: string;
 };
 
+const MAX_COPY_LENGTH = 5000;
+
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
 
@@ -75,6 +77,12 @@ export async function checkToneAction(
   if (!inputText) {
     return {
       error: "Please enter copy to check.",
+    };
+  }
+
+  if (inputText.length > MAX_COPY_LENGTH) {
+    return {
+      error: `Copy must be ${MAX_COPY_LENGTH} characters or fewer.`,
     };
   }
 
