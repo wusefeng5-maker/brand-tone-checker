@@ -1,8 +1,11 @@
 import { requireAdmin } from "@/lib/admin-auth";
+import { Suspense } from "react";
 import { ADMIN_PAGE_SIZE, parseAdminPage } from "@/lib/admin-rules";
 import { prisma } from "@/lib/prisma";
 import { AdminPage } from "@/components/admin/admin-page";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { EmptyState } from "@/components/ui/empty-state";
+import { TableSkeleton } from "@/components/ui/skeleton";
 
 type AdminUsersPageProps = {
   searchParams: Promise<{
@@ -43,13 +46,24 @@ export default async function AdminUsersPage({
   await requireAdmin();
   const params = await searchParams;
   const page = parseAdminPage(params.page);
-  const { users, hasNextPage } = await getUsers(page);
 
   return (
     <AdminPage
       description="Read-only user list with profile and tone check counts."
       title="Users"
     >
+      <Suspense fallback={<TableSkeleton />}>
+        <AdminUsersTable page={page} />
+      </Suspense>
+    </AdminPage>
+  );
+}
+
+async function AdminUsersTable({ page }: { page: number }) {
+  const { users, hasNextPage } = await getUsers(page);
+
+  return (
+    <>
       <div className="overflow-hidden rounded-3xl border border-zinc-100 bg-white shadow-sm shadow-zinc-200/70">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
@@ -84,8 +98,11 @@ export default async function AdminUsersPage({
           </table>
         </div>
         {users.length === 0 ? (
-          <div className="px-5 py-10 text-center text-sm font-medium text-zinc-500">
-            No users found.
+          <div className="p-5">
+            <EmptyState
+              description="Users will appear here after they create an account and use the app."
+              title="No users found"
+            />
           </div>
         ) : null}
       </div>
@@ -95,6 +112,6 @@ export default async function AdminUsersPage({
         hasNextPage={hasNextPage}
         page={page}
       />
-    </AdminPage>
+    </>
   );
 }

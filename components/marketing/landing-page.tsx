@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { DemoMockup } from "@/components/marketing/demo-mockup";
 import { Logo } from "@/components/marketing/logo";
 import { SectionHeading } from "@/components/marketing/section-heading";
 import { landingContent } from "@/lib/landing-content";
 
-export function LandingPage() {
+export function LandingPage({ ctaHref }: { ctaHref: string }) {
   const content = landingContent;
 
   return (
@@ -37,18 +38,18 @@ export function LandingPage() {
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <a
+            <Link
               className="hidden rounded-full px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-white sm:inline-flex"
-              href="#"
+              href="/sign-in"
             >
               {content.navActions.login}
-            </a>
-            <a
+            </Link>
+            <Link
               className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-zinc-900/10 transition hover:-translate-y-0.5"
-              href="#cta"
+              href={ctaHref}
             >
               {content.navActions.start}
-            </a>
+            </Link>
           </div>
         </nav>
       </header>
@@ -71,12 +72,12 @@ export function LandingPage() {
               {content.hero.subtitle}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
+              <Link
                 className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#e8443a] to-[#ff7a45] px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-orange-300/40 transition hover:-translate-y-0.5"
-                href="#cta"
+                href={ctaHref}
               >
                 {content.hero.primaryCta}
-              </a>
+              </Link>
               <a
                 className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200"
                 href="#demo"
@@ -208,12 +209,12 @@ export function LandingPage() {
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/85">
             {content.cta.description}
           </p>
-          <a
+          <Link
             className="mt-8 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5"
-            href="#"
+            href={ctaHref}
           >
             {content.cta.button}
-          </a>
+          </Link>
         </div>
       </section>
     );
@@ -224,9 +225,9 @@ export function LandingPage() {
       <footer className="mx-auto flex max-w-7xl flex-col gap-4 px-5 pb-10 pt-4 text-sm text-zinc-500 sm:px-8 md:flex-row md:items-center md:justify-between">
         <p>{content.product.copyright}</p>
         <div className="flex flex-wrap gap-5">
-          <a className="hover:text-zinc-950" href="#">
+          <span>
             {content.footer.privacy}
-          </a>
+          </span>
           <span>{content.footer.contact}</span>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { requireAdmin } from "@/lib/admin-auth";
+import { Suspense } from "react";
 import {
   ADMIN_PAGE_SIZE,
   parseAdminPage,
@@ -7,7 +8,10 @@ import {
 } from "@/lib/admin-rules";
 import { prisma } from "@/lib/prisma";
 import { AdminPage } from "@/components/admin/admin-page";
+import { AdminFilterButton } from "@/components/admin/admin-filter-button";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { EmptyState } from "@/components/ui/empty-state";
+import { TableSkeleton } from "@/components/ui/skeleton";
 
 type AdminAiLogsPageProps = {
   searchParams: Promise<{
@@ -77,7 +81,6 @@ export default async function AdminAiLogsPage({
   const params = await searchParams;
   const page = parseAdminPage(params.page);
   const filters = parseAiLogFilters(params);
-  const { logs, hasNextPage } = await getAiLogs(page, filters);
 
   return (
     <AdminPage
@@ -122,15 +125,28 @@ export default async function AdminAiLogsPage({
           </select>
         </label>
         <div className="flex items-end">
-          <button
-            className="w-full rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
-            type="submit"
-          >
-            Filter
-          </button>
+          <AdminFilterButton />
         </div>
       </form>
 
+      <Suspense fallback={<TableSkeleton />}>
+        <AdminAiLogsTable filters={filters} page={page} />
+      </Suspense>
+    </AdminPage>
+  );
+}
+
+async function AdminAiLogsTable({
+  page,
+  filters,
+}: {
+  page: number;
+  filters: ReturnType<typeof parseAiLogFilters>;
+}) {
+  const { logs, hasNextPage } = await getAiLogs(page, filters);
+
+  return (
+    <>
       <div className="overflow-hidden rounded-3xl border border-zinc-100 bg-white shadow-sm shadow-zinc-200/70">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left text-sm">
@@ -171,8 +187,11 @@ export default async function AdminAiLogsPage({
           </table>
         </div>
         {logs.length === 0 ? (
-          <div className="px-5 py-10 text-center text-sm font-medium text-zinc-500">
-            No AI logs found.
+          <div className="p-5">
+            <EmptyState
+              description="AI request logs will appear here after tone checks are submitted."
+              title="No AI logs found"
+            />
           </div>
         ) : null}
       </div>
@@ -187,6 +206,6 @@ export default async function AdminAiLogsPage({
           status: filters.status,
         }}
       />
-    </AdminPage>
+    </>
   );
 }

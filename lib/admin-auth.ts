@@ -1,8 +1,9 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { isAdminEmailAllowed } from "@/lib/admin-rules";
 
-export async function requireAdmin() {
+export const requireAdmin = cache(async function requireAdmin() {
   const user = await currentUser();
   const email = user?.primaryEmailAddress?.emailAddress ?? null;
 
@@ -13,4 +14,4 @@ export async function requireAdmin() {
   return {
     email,
   };
-}
+});

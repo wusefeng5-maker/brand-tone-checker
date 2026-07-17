@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import type { BrandProfileActionState } from "@/app/(app)/profiles/actions";
+import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
 
 export type BrandProfileFormValues = {
   name?: string;
@@ -24,14 +26,18 @@ type BrandProfileFormProps = {
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
+  const pendingLabel = label.toLowerCase().includes("create")
+    ? "Creating..."
+    : "Saving...";
 
   return (
     <button
-      className="rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950"
       disabled={pending}
       type="submit"
     >
-      {pending ? "Saving..." : label}
+      {pending ? <Spinner /> : null}
+      {pending ? pendingLabel : label}
     </button>
   );
 }
@@ -49,11 +55,7 @@ export function BrandProfileForm({
 
   return (
     <form action={formAction} className="space-y-6">
-      {state.message ? (
-        <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-medium text-orange-800">
-          {state.message}
-        </div>
-      ) : null}
+      <Toast message={state.message} tone={state.errors ? "error" : "info"} />
 
       <label className="block">
         <span className="text-sm font-semibold text-zinc-800">Brand name</span>
@@ -62,6 +64,7 @@ export function BrandProfileForm({
           defaultValue={initialValues?.name ?? ""}
           name="name"
           placeholder="Example: Duiwei AI"
+          required
         />
         {state.errors?.name ? (
           <span className="mt-2 block text-sm text-red-600">

@@ -1,7 +1,5 @@
-import {
-  buildToneCheckPrompt,
-  parseToneCheckResult,
-} from "./tone-check-core";
+import { buildToneCheckPrompt } from "@/lib/prompt/prompt-builder";
+import { parseToneCheckResult } from "./tone-check-core";
 import { getAiProvider } from "./providers";
 import type { ToneCheckBrandProfile, ToneCheckResult } from "./types";
 

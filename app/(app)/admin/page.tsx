@@ -1,6 +1,8 @@
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { AdminPage, AdminStatCard } from "@/components/admin/admin-page";
+import { Suspense } from "react";
+import { CardGridSkeleton } from "@/components/ui/skeleton";
 
 async function getAdminStats() {
   const [
@@ -32,26 +34,35 @@ async function getAdminStats() {
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const stats = await getAdminStats();
 
   return (
     <AdminPage
       description="Read-only platform totals for the current MVP."
       title="Admin overview"
     >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <AdminStatCard label="Total Users" value={stats.totalUsers} />
-        <AdminStatCard
-          label="Total Brand Profiles"
-          value={stats.totalBrandProfiles}
-        />
-        <AdminStatCard label="Total Tone Checks" value={stats.totalToneChecks} />
-        <AdminStatCard label="Total AI Requests" value={stats.totalAiRequests} />
-        <AdminStatCard
-          label="Total Failed AI Requests"
-          value={stats.totalFailedAiRequests}
-        />
-      </div>
+      <Suspense fallback={<CardGridSkeleton count={5} />}>
+        <AdminStatsGrid />
+      </Suspense>
     </AdminPage>
+  );
+}
+
+async function AdminStatsGrid() {
+  const stats = await getAdminStats();
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <AdminStatCard label="Total Users" value={stats.totalUsers} />
+      <AdminStatCard
+        label="Total Brand Profiles"
+        value={stats.totalBrandProfiles}
+      />
+      <AdminStatCard label="Total Tone Checks" value={stats.totalToneChecks} />
+      <AdminStatCard label="Total AI Requests" value={stats.totalAiRequests} />
+      <AdminStatCard
+        label="Total Failed AI Requests"
+        value={stats.totalFailedAiRequests}
+      />
+    </div>
   );
 }

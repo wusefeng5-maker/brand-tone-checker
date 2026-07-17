@@ -6,6 +6,8 @@ import { useFormStatus } from "react-dom";
 import { checkToneAction } from "@/app/(app)/check/actions";
 import type { CheckToneActionState } from "@/app/(app)/check/actions";
 import { ToneCheckResultView } from "@/components/check/tone-check-result";
+import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
 
 type BrandProfileOption = {
   id: string;
@@ -16,15 +18,17 @@ type ToneCheckFormProps = {
   brandProfiles: BrandProfileOption[];
 };
 
-function CheckButton() {
+function CheckButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
 
   return (
     <button
-      className="rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={pending}
+      className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950"
+      disabled={isDisabled}
       type="submit"
     >
+      {pending ? <Spinner /> : null}
       {pending ? "Checking..." : "Check"}
     </button>
   );
@@ -43,11 +47,11 @@ export function ToneCheckForm({ brandProfiles }: ToneCheckFormProps) {
         action={formAction}
         className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm shadow-zinc-200/70 sm:p-8"
       >
-        {state.error ? (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            {state.error}
-          </div>
-        ) : null}
+        <Toast message={state.error} tone="error" />
+        <Toast
+          message={state.result ? "Tone check completed." : undefined}
+          tone="success"
+        />
 
         <div className="space-y-6">
           <label className="block">
@@ -76,15 +80,22 @@ export function ToneCheckForm({ brandProfiles }: ToneCheckFormProps) {
               Copy to check
             </span>
             <textarea
-              className="mt-2 min-h-56 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950"
+              className="mt-2 min-h-56 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-base text-zinc-950 outline-none transition focus:border-zinc-950 disabled:bg-zinc-50 disabled:text-zinc-400"
+              disabled={!hasBrandProfiles}
               name="inputText"
               placeholder="Paste the copy you want to check against this brand profile."
+              required={hasBrandProfiles}
             />
           </label>
         </div>
 
         <div className="mt-6">
-          <CheckButton />
+          <CheckButton disabled={!hasBrandProfiles} />
+          {!hasBrandProfiles ? (
+            <p className="mt-3 text-sm text-zinc-500">
+              Create a brand profile before running your first tone check.
+            </p>
+          ) : null}
         </div>
       </form>
 

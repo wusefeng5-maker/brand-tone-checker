@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { canCreateBrandProfile, type PlanName } from "@/lib/brand-profile-rules";
 import { BrandProfileCard } from "@/components/profiles/brand-profile-card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 async function getBrandProfiles() {
   const { userId } = await auth.protect();
@@ -63,21 +64,12 @@ export default async function BrandProfilesPage() {
             <BrandProfileCard key={profile.id} profile={profile} />
           ))
         ) : (
-          <div className="rounded-3xl border border-dashed border-zinc-200 bg-white p-8 text-center">
-            <h2 className="text-xl font-semibold text-zinc-950">
-              No brand profiles yet
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-600">
-              Create the first profile to record the basic rules for this brand
-              voice.
-            </p>
-            <Link
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
-              href="/profiles/new"
-            >
-              Create first brand profile
-            </Link>
-          </div>
+          <EmptyState
+            actionHref="/profiles/new"
+            actionLabel="Create first brand profile"
+            description="Create the first profile to record the basic rules for this brand voice."
+            title="No brand profiles yet"
+          />
         )}
       </div>
     </section>
