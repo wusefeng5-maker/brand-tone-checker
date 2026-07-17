@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  quality:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      DATABASE_URL: postgresql://user:password@localhost:5432/brand_tone_checker?schema=public
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+      CLERK_SECRET_KEY: sk_test_placeholder
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: /dashboard
+      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: /dashboard
+      ADMIN_EMAILS: admin@example.com
+      AI_PROVIDER: openai-compatible
+      OPENAI_COMPATIBLE_BASE_URL: https://api.openai.com/v1
+      OPENAI_COMPATIBLE_API_KEY: sk-test-placeholder
+      OPENAI_COMPATIBLE_MODEL: gpt-5.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
