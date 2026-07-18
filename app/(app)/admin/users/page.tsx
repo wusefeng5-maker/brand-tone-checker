@@ -6,6 +6,9 @@ import { AdminPage } from "@/components/admin/admin-page";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TableSkeleton } from "@/components/ui/skeleton";
+import type { Dictionary, Locale } from "@/lib/i18n/config";
+import { formatDateTime } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/server";
 
 type AdminUsersPageProps = {
   searchParams: Promise<{
@@ -43,23 +46,32 @@ async function getUsers(page: number) {
 export default async function AdminUsersPage({
   searchParams,
 }: AdminUsersPageProps) {
-  await requireAdmin();
+  const [, { locale, t }] = await Promise.all([requireAdmin(), getDictionary()]);
   const params = await searchParams;
   const page = parseAdminPage(params.page);
 
   return (
     <AdminPage
-      description="Read-only user list with profile and tone check counts."
-      title="Users"
+      description={t.admin.usersDescription}
+      labels={t.admin}
+      title={t.admin.users}
     >
       <Suspense fallback={<TableSkeleton />}>
-        <AdminUsersTable page={page} />
+        <AdminUsersTable labels={t} locale={locale} page={page} />
       </Suspense>
     </AdminPage>
   );
 }
 
-async function AdminUsersTable({ page }: { page: number }) {
+async function AdminUsersTable({
+  labels,
+  locale,
+  page,
+}: {
+  labels: Dictionary;
+  locale: Locale;
+  page: number;
+}) {
   const { users, hasNextPage } = await getUsers(page);
 
   return (
@@ -69,18 +81,18 @@ async function AdminUsersTable({ page }: { page: number }) {
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50 text-xs font-semibold uppercase tracking-normal text-zinc-500">
               <tr>
-                <th className="px-5 py-4">Email</th>
-                <th className="px-5 py-4">Plan</th>
-                <th className="px-5 py-4">Brand Profile Count</th>
-                <th className="px-5 py-4">Tone Check Count</th>
-                <th className="px-5 py-4">Created At</th>
+                <th className="px-5 py-4">{labels.admin.email}</th>
+                <th className="px-5 py-4">{labels.admin.plan}</th>
+                <th className="px-5 py-4">{labels.admin.brandProfileCount}</th>
+                <th className="px-5 py-4">{labels.admin.toneCheckCount}</th>
+                <th className="px-5 py-4">{labels.admin.createdAt}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-5 py-4 font-medium text-zinc-950">
-                    {user.email ?? "No email"}
+                    {user.email ?? labels.common.noEmail}
                   </td>
                   <td className="px-5 py-4 text-zinc-600">{user.plan}</td>
                   <td className="px-5 py-4 text-zinc-600">
@@ -90,7 +102,7 @@ async function AdminUsersTable({ page }: { page: number }) {
                     {user._count.checks}
                   </td>
                   <td className="px-5 py-4 text-zinc-600">
-                    {user.createdAt.toLocaleString()}
+                    {formatDateTime(user.createdAt, locale)}
                   </td>
                 </tr>
               ))}
@@ -100,8 +112,8 @@ async function AdminUsersTable({ page }: { page: number }) {
         {users.length === 0 ? (
           <div className="p-5">
             <EmptyState
-              description="Users will appear here after they create an account and use the app."
-              title="No users found"
+              description={labels.admin.emptyUsersDescription}
+              title={labels.admin.emptyUsers}
             />
           </div>
         ) : null}
@@ -110,6 +122,7 @@ async function AdminUsersTable({ page }: { page: number }) {
       <AdminPagination
         basePath="/admin/users"
         hasNextPage={hasNextPage}
+        labels={labels.common}
         page={page}
       />
     </>

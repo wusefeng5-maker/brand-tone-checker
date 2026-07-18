@@ -1,23 +1,32 @@
 import Link from "next/link";
-
-const adminLinks = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/ai-logs", label: "AI Logs" },
-];
+import type { Dictionary } from "@/lib/i18n/config";
 
 type AdminPageProps = {
   title: string;
   description: string;
   children: React.ReactNode;
+  labels: Dictionary["admin"];
 };
 
-export function AdminPage({ title, description, children }: AdminPageProps) {
+export function AdminPage({
+  title,
+  description,
+  children,
+  labels,
+}: AdminPageProps) {
+  const adminLinks = [
+    { href: "/admin", label: labels.overview },
+    { href: "/admin/users", label: labels.users },
+    { href: "/admin/ai-logs", label: labels.aiLogs },
+  ];
+
   return (
     <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-sm font-semibold text-orange-600">Admin</p>
+          <p className="text-sm font-semibold text-orange-600">
+            {labels.eyebrow}
+          </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
             {title}
           </h1>

@@ -1,24 +1,26 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { Suspense } from "react";
 import { CardGridSkeleton } from "@/components/ui/skeleton";
+import { getDictionary } from "@/lib/i18n/server";
 
 async function DashboardCard() {
-  const user = await currentUser();
+  const [user, { t }] = await Promise.all([currentUser(), getDictionary()]);
   const displayName =
     user?.firstName ||
     user?.username ||
     user?.primaryEmailAddress?.emailAddress ||
-    "Welcome back";
+    t.dashboard.welcome;
 
   return (
     <div className="rounded-[2rem] border border-zinc-100 bg-white p-8 shadow-sm shadow-zinc-200/70">
-      <p className="text-sm font-semibold text-orange-600">Dashboard</p>
+      <p className="text-sm font-semibold text-orange-600">
+        {t.dashboard.title}
+      </p>
       <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
-        {displayName}, authentication is connected
+        {displayName}, {t.dashboard.heading}
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-        This is the protected app placeholder page. Brand profiles, AI checks,
-        history, and business data are available through the app navigation.
+        {t.dashboard.description}
       </p>
     </div>
   );

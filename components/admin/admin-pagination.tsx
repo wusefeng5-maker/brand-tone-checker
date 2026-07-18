@@ -4,6 +4,10 @@ type AdminPaginationProps = {
   basePath: string;
   page: number;
   hasNextPage: boolean;
+  labels: {
+    next: string;
+    previous: string;
+  };
   searchParams?: Record<string, string | undefined>;
 };
 
@@ -34,6 +38,7 @@ export function AdminPagination({
   basePath,
   page,
   hasNextPage,
+  labels,
   searchParams = {},
 }: AdminPaginationProps) {
   return (
@@ -43,26 +48,26 @@ export function AdminPagination({
           className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-600 transition hover:text-zinc-950"
           href={buildHref(basePath, page - 1, searchParams)}
         >
-          Previous
+          {labels.previous}
         </Link>
       ) : (
         <span className="rounded-full border border-zinc-100 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-300">
-          Previous
+          {labels.previous}
         </span>
       )}
 
-      <span className="text-sm font-semibold text-zinc-500">Page {page}</span>
+      <span className="text-sm font-semibold text-zinc-500">{page}</span>
 
       {hasNextPage ? (
         <Link
           className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-600 transition hover:text-zinc-950"
           href={buildHref(basePath, page + 1, searchParams)}
         >
-          Next
+          {labels.next}
         </Link>
       ) : (
         <span className="rounded-full border border-zinc-100 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-300">
-          Next
+          {labels.next}
         </span>
       )}
     </div>

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { canCreateBrandProfile, type PlanName } from "@/lib/brand-profile-rules";
 import { BrandProfileCard } from "@/components/profiles/brand-profile-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { getDictionary } from "@/lib/i18n/server";
 
 async function getBrandProfiles() {
   const { userId } = await auth.protect();
@@ -27,21 +28,24 @@ async function getBrandProfiles() {
 }
 
 export default async function BrandProfilesPage() {
-  const { plan, profiles } = await getBrandProfiles();
+  const [{ plan, profiles }, { locale, t }] = await Promise.all([
+    getBrandProfiles(),
+    getDictionary(),
+  ]);
   const canCreate = canCreateBrandProfile(plan as PlanName, profiles.length);
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-orange-600">Brand Profiles</p>
+          <p className="text-sm font-semibold text-orange-600">
+            {t.profiles.eyebrow}
+          </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
-            Brand profiles
+            {t.profiles.title}
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600">
-            Maintain brand voice, forbidden words, required words, and example
-            copy. Future tone checks will use these profiles as the source of
-            truth.
+            {t.profiles.description}
           </p>
         </div>
         {canCreate ? (
@@ -49,11 +53,11 @@ export default async function BrandProfilesPage() {
             className="inline-flex items-center justify-center rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
             href="/profiles/new"
           >
-            New brand profile
+            {t.profiles.newProfile}
           </Link>
         ) : (
           <span className="rounded-full border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-800">
-            Free plan allows 1 brand profile
+            {t.profiles.freeLimit}
           </span>
         )}
       </div>
@@ -61,14 +65,19 @@ export default async function BrandProfilesPage() {
       <div className="mt-8 space-y-5">
         {profiles.length > 0 ? (
           profiles.map((profile) => (
-            <BrandProfileCard key={profile.id} profile={profile} />
+            <BrandProfileCard
+              key={profile.id}
+              labels={t}
+              locale={locale}
+              profile={profile}
+            />
           ))
         ) : (
           <EmptyState
             actionHref="/profiles/new"
-            actionLabel="Create first brand profile"
-            description="Create the first profile to record the basic rules for this brand voice."
-            title="No brand profiles yet"
+            actionLabel={t.profiles.emptyAction}
+            description={t.profiles.emptyDescription}
+            title={t.profiles.emptyTitle}
           />
         )}
       </div>

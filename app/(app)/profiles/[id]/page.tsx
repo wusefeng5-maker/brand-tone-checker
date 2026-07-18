@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { updateBrandProfileAction } from "@/app/(app)/profiles/actions";
 import { BrandProfileForm } from "@/components/profiles/brand-profile-form";
+import { getDictionary } from "@/lib/i18n/server";
 
 type EditBrandProfilePageProps = {
   params: Promise<{
@@ -16,14 +17,17 @@ export default async function EditBrandProfilePage({
 }: EditBrandProfilePageProps) {
   const { id } = await params;
   const { userId } = await auth.protect();
-  const profile = await prisma.brandProfile.findFirst({
-    where: {
-      id,
-      user: {
-        clerkUserId: userId,
+  const [{ t }, profile] = await Promise.all([
+    getDictionary(),
+    prisma.brandProfile.findFirst({
+      where: {
+        id,
+        user: {
+          clerkUserId: userId,
+        },
       },
-    },
-  });
+    }),
+  ]);
 
   if (!profile) {
     notFound();
@@ -37,18 +41,21 @@ export default async function EditBrandProfilePage({
         className="text-sm font-semibold text-zinc-500 hover:text-zinc-950"
         href="/profiles"
       >
-        Back to brand profiles
+        {t.profiles.back}
       </Link>
       <div className="mt-6 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm shadow-zinc-200/70 sm:p-8">
-        <p className="text-sm font-semibold text-orange-600">Edit Profile</p>
+        <p className="text-sm font-semibold text-orange-600">
+          {t.profiles.eyebrow}
+        </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
-          Edit brand profile
+          {t.common.edit} {t.profiles.title}
         </h1>
         <div className="mt-8">
           <BrandProfileForm
             action={updateAction}
             initialValues={profile}
-            submitLabel="Save changes"
+            labels={t.common}
+            submitLabel={t.common.save}
           />
         </div>
       </div>

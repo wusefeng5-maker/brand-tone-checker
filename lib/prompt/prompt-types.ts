@@ -5,6 +5,10 @@ export type PromptVariableName =
   | "requiredWords"
   | "forbiddenWords"
   | "example"
+  | "platform"
+  | "checkAudience"
+  | "goal"
+  | "language"
   | "copy";
 
 export type PromptVariables = Record<PromptVariableName, string>;
@@ -25,5 +29,11 @@ export type ToneCheckPromptBrandProfile = {
 
 export type BuildToneCheckPromptInput = {
   brandProfile: ToneCheckPromptBrandProfile;
+  context: {
+    platform: string;
+    audience: string;
+    goal: string;
+    language: string;
+  };
   inputText: string;
 };

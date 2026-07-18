@@ -2,8 +2,10 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { createBrandProfileAction } from "@/app/(app)/profiles/actions";
+import { BrandBrainBuilder } from "@/components/profiles/brand-brain-builder";
 import { BrandProfileForm } from "@/components/profiles/brand-profile-form";
 import { canCreateBrandProfile, type PlanName } from "@/lib/brand-profile-rules";
+import { getDictionary } from "@/lib/i18n/server";
 
 async function getCreateAvailability() {
   const { userId } = await auth.protect();
@@ -27,7 +29,10 @@ async function getCreateAvailability() {
 }
 
 export default async function NewBrandProfilePage() {
-  const canCreate = await getCreateAvailability();
+  const [canCreate, { t }] = await Promise.all([
+    getCreateAvailability(),
+    getDictionary(),
+  ]);
 
   return (
     <section className="mx-auto max-w-5xl px-5 py-12 sm:px-8">
@@ -35,24 +40,35 @@ export default async function NewBrandProfilePage() {
         className="text-sm font-semibold text-zinc-500 hover:text-zinc-950"
         href="/profiles"
       >
-        Back to brand profiles
+        {t.profiles.back}
       </Link>
       <div className="mt-6 rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm shadow-zinc-200/70 sm:p-8">
-        <p className="text-sm font-semibold text-orange-600">New Profile</p>
+        <p className="text-sm font-semibold text-orange-600">
+          {t.profiles.eyebrow}
+        </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
-          New brand profile
+          {t.profiles.newTitle}
         </h1>
         {canCreate ? (
-          <div className="mt-8">
-            <BrandProfileForm
-              action={createBrandProfileAction}
-              submitLabel="Create brand profile"
-            />
+          <div className="mt-8 space-y-8">
+            <BrandBrainBuilder labels={t.brandBrain} />
+            <div>
+              <h2 className="text-xl font-semibold tracking-normal text-zinc-950">
+                {t.profiles.manualTitle}
+              </h2>
+              <div className="mt-5">
+                <BrandProfileForm
+                  action={createBrandProfileAction}
+                  labels={t.common}
+                  submitLabel={t.profiles.newProfile}
+                />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="mt-8 rounded-2xl border border-orange-200 bg-orange-50 p-5 text-orange-900">
             <h2 className="font-semibold">
-              Free plan allows 1 brand profile
+              {t.profiles.freeLimit}
             </h2>
             <p className="mt-2 text-sm leading-6">
               You already have a brand profile. Payments and upgrades are not

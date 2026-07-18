@@ -3,7 +3,13 @@
 import { useFormStatus } from "react-dom";
 import { Spinner } from "@/components/ui/spinner";
 
-export function AdminFilterButton() {
+export function AdminFilterButton({
+  label,
+  pendingLabel,
+}: {
+  label: string;
+  pendingLabel: string;
+}) {
   const { pending } = useFormStatus();
 
   return (
@@ -13,7 +19,7 @@ export function AdminFilterButton() {
       type="submit"
     >
       {pending ? <Spinner /> : null}
-      {pending ? "Filtering..." : "Filter"}
+      {pending ? pendingLabel : label}
     </button>
   );
 }

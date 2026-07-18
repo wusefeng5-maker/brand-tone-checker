@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { AdminPage, AdminStatCard } from "@/components/admin/admin-page";
 import { Suspense } from "react";
 import { CardGridSkeleton } from "@/components/ui/skeleton";
+import type { Dictionary } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/server";
 
 async function getAdminStats() {
   const [
@@ -33,34 +35,35 @@ async function getAdminStats() {
 }
 
 export default async function AdminOverviewPage() {
-  await requireAdmin();
+  const [, { t }] = await Promise.all([requireAdmin(), getDictionary()]);
 
   return (
     <AdminPage
-      description="Read-only platform totals for the current MVP."
-      title="Admin overview"
+      description={t.admin.overviewDescription}
+      labels={t.admin}
+      title={t.admin.overview}
     >
       <Suspense fallback={<CardGridSkeleton count={5} />}>
-        <AdminStatsGrid />
+        <AdminStatsGrid labels={t.admin} />
       </Suspense>
     </AdminPage>
   );
 }
 
-async function AdminStatsGrid() {
+async function AdminStatsGrid({ labels }: { labels: Dictionary["admin"] }) {
   const stats = await getAdminStats();
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      <AdminStatCard label="Total Users" value={stats.totalUsers} />
+      <AdminStatCard label={labels.totalUsers} value={stats.totalUsers} />
       <AdminStatCard
-        label="Total Brand Profiles"
+        label={labels.totalBrandProfiles}
         value={stats.totalBrandProfiles}
       />
-      <AdminStatCard label="Total Tone Checks" value={stats.totalToneChecks} />
-      <AdminStatCard label="Total AI Requests" value={stats.totalAiRequests} />
+      <AdminStatCard label={labels.totalToneChecks} value={stats.totalToneChecks} />
+      <AdminStatCard label={labels.totalAiRequests} value={stats.totalAiRequests} />
       <AdminStatCard
-        label="Total Failed AI Requests"
+        label={labels.totalFailedAiRequests}
         value={stats.totalFailedAiRequests}
       />
     </div>

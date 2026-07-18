@@ -1,7 +1,44 @@
-import { landingContent } from "@/lib/landing-content";
+import type { Locale } from "@/lib/i18n/config";
 
-export function DemoMockup() {
-  const { demo } = landingContent;
+const demoContent = {
+  zh: {
+    title: "静态演示",
+    status: "已对味",
+    brandProfile: "品牌档案：新消费茶饮",
+    input: "本周新品上线，喜欢的朋友赶紧下单，错过就没有了。",
+    scoreBefore: "62",
+    scoreAfter: "92",
+    issues: ["语气过度催促", "缺少品牌关键词", "促销感偏强"],
+    rewrite:
+      "本周新品来了。清爽、轻甜、刚刚好，适合把今天过成一点点小假期。",
+    issuesTitle: "发现的问题",
+    rewriteTitle: "建议改写",
+    scoreLabels: {
+      before: "检查前",
+      after: "改写后",
+    },
+  },
+  en: {
+    title: "Static demo",
+    status: "On brand",
+    brandProfile: "Brand Brain: modern tea brand",
+    input: "New product is live this week. Order now before it is gone.",
+    scoreBefore: "62",
+    scoreAfter: "92",
+    issues: ["CTA is too aggressive", "Missing brand keywords", "Feels too promotional"],
+    rewrite:
+      "This week's new drink is here: crisp, lightly sweet, and made for a small pause in your day.",
+    issuesTitle: "Issues found",
+    rewriteTitle: "Suggested rewrite",
+    scoreLabels: {
+      before: "Before",
+      after: "After",
+    },
+  },
+} as const;
+
+export function DemoMockup({ locale }: { locale: Locale }) {
+  const demo = demoContent[locale];
 
   return (
     <div className="relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white p-4 shadow-2xl shadow-orange-200/60">
@@ -11,7 +48,9 @@ export function DemoMockup() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">
               {demo.title}
             </p>
-            <p className="mt-1 text-sm font-medium text-zinc-700">{demo.brandProfile}</p>
+            <p className="mt-1 text-sm font-medium text-zinc-700">
+              {demo.brandProfile}
+            </p>
           </div>
           <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
             {demo.status}
@@ -28,12 +67,22 @@ export function DemoMockup() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <ScoreTile label={demo.scoreLabels.before} score={demo.scoreBefore} tone="warn" />
-          <ScoreTile label={demo.scoreLabels.after} score={demo.scoreAfter} tone="good" />
+          <ScoreTile
+            label={demo.scoreLabels.before}
+            score={demo.scoreBefore}
+            tone="warn"
+          />
+          <ScoreTile
+            label={demo.scoreLabels.after}
+            score={demo.scoreAfter}
+            tone="good"
+          />
         </div>
 
         <div className="mt-4 rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
-          <p className="text-sm font-semibold text-zinc-900">{demo.issuesTitle}</p>
+          <p className="text-sm font-semibold text-zinc-900">
+            {demo.issuesTitle}
+          </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {demo.issues.map((issue) => (
               <span
@@ -47,7 +96,9 @@ export function DemoMockup() {
         </div>
 
         <div className="mt-4 rounded-2xl border border-emerald-100 bg-white p-4">
-          <p className="mb-2 text-sm font-semibold text-zinc-900">{demo.rewriteTitle}</p>
+          <p className="mb-2 text-sm font-semibold text-zinc-900">
+            {demo.rewriteTitle}
+          </p>
           <p className="text-sm leading-6 text-zinc-600">{demo.rewrite}</p>
         </div>
       </div>

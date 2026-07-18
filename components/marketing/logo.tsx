@@ -1,5 +1,3 @@
-import { landingContent } from "@/lib/landing-content";
-
 export function Logo() {
   return (
     <div className="flex items-center gap-3">
@@ -33,11 +31,9 @@ export function Logo() {
       </svg>
       <div className="leading-tight">
         <div className="text-base font-semibold text-zinc-950">
-          {landingContent.product.name}
+          对味
         </div>
-        <div className="text-xs font-medium text-zinc-500">
-          {landingContent.product.englishName}
-        </div>
+        <div className="text-xs font-medium text-zinc-500">Duìwèi AI</div>
       </div>
     </div>
   );

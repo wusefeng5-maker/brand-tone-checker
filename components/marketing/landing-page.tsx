@@ -1,11 +1,21 @@
 import Link from "next/link";
 import { DemoMockup } from "@/components/marketing/demo-mockup";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { Logo } from "@/components/marketing/logo";
 import { SectionHeading } from "@/components/marketing/section-heading";
-import { landingContent } from "@/lib/landing-content";
+import { getLandingContent } from "@/lib/landing-content";
+import type { Dictionary, Locale } from "@/lib/i18n/config";
 
-export function LandingPage({ ctaHref }: { ctaHref: string }) {
-  const content = landingContent;
+export function LandingPage({
+  ctaHref,
+  labels,
+  locale,
+}: {
+  ctaHref: string;
+  labels: Dictionary["common"];
+  locale: Locale;
+}) {
+  const content = getLandingContent(locale);
 
   return (
     <main className="min-h-screen bg-[#f6f7fb] text-zinc-950">
@@ -38,6 +48,7 @@ export function LandingPage({ ctaHref }: { ctaHref: string }) {
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher labels={labels} locale={locale} />
             <Link
               className="hidden rounded-full px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-white sm:inline-flex"
               href="/sign-in"
@@ -87,7 +98,7 @@ export function LandingPage({ ctaHref }: { ctaHref: string }) {
             </div>
           </div>
           <div id="demo">
-            <DemoMockup />
+            <DemoMockup locale={locale} />
           </div>
         </div>
       </section>

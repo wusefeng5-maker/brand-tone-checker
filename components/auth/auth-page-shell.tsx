@@ -2,12 +2,16 @@ import { Logo } from "@/components/marketing/logo";
 
 export function AuthPageShell({
   children,
-  title,
   description,
+  heroDescription,
+  heroTitle,
+  title,
 }: Readonly<{
   children: React.ReactNode;
-  title: string;
   description: string;
+  heroDescription: string;
+  heroTitle: string;
+  title: string;
 }>) {
   return (
     <main className="grid min-h-screen bg-[#f6f7fb] px-5 py-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
@@ -15,10 +19,10 @@ export function AuthPageShell({
         <Logo />
         <div>
           <h1 className="max-w-xl text-5xl font-semibold leading-tight tracking-normal">
-            每条文案发出去前，先确认它对不对味。
+            {heroTitle}
           </h1>
           <p className="mt-5 max-w-lg text-base leading-7 text-white/85">
-            登录后即可进入工作台。品牌档案、语调检查和历史记录将在后续阶段逐步接入。
+            {heroDescription}
           </p>
         </div>
         <p className="text-sm text-white/75">对味 Duìwèi AI</p>
@@ -33,7 +37,9 @@ export function AuthPageShell({
             <h2 className="text-3xl font-semibold tracking-normal text-zinc-950">
               {title}
             </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-600">{description}</p>
+            <p className="mt-3 text-sm leading-6 text-zinc-600">
+              {description}
+            </p>
           </div>
           {children}
         </div>

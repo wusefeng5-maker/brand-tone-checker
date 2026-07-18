@@ -15,6 +15,7 @@ function formatText(value: string | null) {
 
 function buildToneCheckVariables({
   brandProfile,
+  context,
   inputText,
 }: BuildToneCheckPromptInput): PromptVariables {
   return {
@@ -24,6 +25,10 @@ function buildToneCheckVariables({
     requiredWords: formatList(brandProfile.requiredWords),
     forbiddenWords: formatList(brandProfile.forbiddenWords),
     example: formatText(brandProfile.exampleCopy),
+    platform: formatText(context.platform),
+    checkAudience: formatText(context.audience),
+    goal: formatText(context.goal),
+    language: formatText(context.language),
     copy: inputText,
   };
 }

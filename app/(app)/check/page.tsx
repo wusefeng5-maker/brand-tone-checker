@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { ToneCheckForm } from "@/components/check/tone-check-form";
+import { getDictionary } from "@/lib/i18n/server";
 
 async function getBrandProfiles() {
   const { userId } = await auth.protect();
@@ -14,8 +15,11 @@ async function getBrandProfiles() {
           updatedAt: "desc",
         },
         select: {
+          audience: true,
+          exampleCopy: true,
           id: true,
           name: true,
+          toneTags: true,
         },
       },
     },
@@ -25,21 +29,26 @@ async function getBrandProfiles() {
 }
 
 export default async function ToneCheckPage() {
-  const brandProfiles = await getBrandProfiles();
+  const [brandProfiles, { locale, t }] = await Promise.all([
+    getBrandProfiles(),
+    getDictionary(),
+  ]);
 
   return (
     <section className="mx-auto max-w-5xl px-5 py-12 sm:px-8">
       <div className="mb-8">
-        <p className="text-sm font-semibold text-orange-600">Tone Check</p>
+        <p className="text-sm font-semibold text-orange-600">
+          {t.check.eyebrow}
+        </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950">
-          AI tone check
+          {t.check.title}
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600">
-          Select a brand profile, paste copy, and get the first MVP tone report.
+          {t.check.description}
         </p>
       </div>
 
-      <ToneCheckForm brandProfiles={brandProfiles} />
+      <ToneCheckForm brandProfiles={brandProfiles} labels={t} locale={locale} />
     </section>
   );
 }

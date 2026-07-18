@@ -3,15 +3,18 @@
 import { useTransition } from "react";
 import { deleteBrandProfileAction } from "@/app/(app)/profiles/actions";
 import { Spinner } from "@/components/ui/spinner";
+import type { Dictionary } from "@/lib/i18n/config";
 
 type DeleteBrandProfileButtonProps = {
   brandProfileId: string;
   brandName: string;
+  labels: Dictionary["common"];
 };
 
 export function DeleteBrandProfileButton({
   brandProfileId,
   brandName,
+  labels,
 }: DeleteBrandProfileButtonProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -21,7 +24,9 @@ export function DeleteBrandProfileButton({
       disabled={isPending}
       onClick={() => {
         const confirmed = window.confirm(
-          `Delete the brand profile "${brandName}"?`,
+          labels.appName === "对味"
+            ? `确认删除品牌档案“${brandName}”？`
+            : `Delete the brand profile "${brandName}"?`,
         );
 
         if (!confirmed) {
@@ -35,7 +40,7 @@ export function DeleteBrandProfileButton({
       type="button"
     >
       {isPending ? <Spinner /> : null}
-      {isPending ? "Deleting..." : "Delete"}
+      {isPending ? labels.deleting : labels.delete}
     </button>
   );
 }
